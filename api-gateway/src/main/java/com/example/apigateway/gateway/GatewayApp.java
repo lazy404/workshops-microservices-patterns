@@ -67,8 +67,11 @@ class Controllers {
     Executor exec;
 
     @RequestMapping(value = "/banners", produces = MediaType.IMAGE_PNG_VALUE)
-    public CompletableFuture<byte[]> getBanners(final HttpServletResponse response) {
+    public CompletableFuture<byte[]> getBanners() {
         final String bannersUrl = "http://localhost:8081/";
+
+        //TODO: on failure return the default banner: "default-banner.png"
+
         return CompletableFuture.supplyAsync(() -> rest.getForObject(bannersUrl, byte[].class), exec);
     }
 
