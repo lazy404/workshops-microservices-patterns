@@ -1,5 +1,7 @@
 package com.example.apigateway.gateway;
 
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,9 +19,17 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+
+import static java.nio.file.Files.readAllBytes;
 
 @SpringBootApplication
 public class GatewayApp {
@@ -55,6 +65,12 @@ public class GatewayApp {
         return executor;
     }
 
+    @Bean
+    byte[] defaultBanner() throws URISyntaxException, IOException {
+        URI uri = GatewayApp.class.getResource("/default-banner.png").toURI();
+        return Files.readAllBytes(Paths.get(uri));
+    }
+
 }
 
 @RestController
@@ -66,13 +82,21 @@ class Controllers {
     @Autowired
     Executor exec;
 
+    @Autowired
+    byte[] defaultBanner;
+
     @RequestMapping(value = "/banners", produces = MediaType.IMAGE_PNG_VALUE)
     public CompletableFuture<byte[]> getBanners() {
         final String bannersUrl = "http://localhost:8081/";
+        
+        final RetryPolicy rt = new RetryPolicy()
+                .retryOn(Exception.class)
+                .withDelay(10, TimeUnit.SECONDS)
+                .withMaxRetries(2);
 
-        //TODO: on failure return the default banner: "default-banner.png"
-
-        return CompletableFuture.supplyAsync(() -> rest.getForObject(bannersUrl, byte[].class), exec);
+        return CompletableFuture.supplyAsync(() -> Failsafe.with(rt)
+                    .withFallback(defaultBanner)
+                    .get(() -> rest.getForObject(bannersUrl, byte[].class)), exec);
     }
 
     @RequestMapping(value = "/api/**", produces = MediaType.APPLICATION_JSON_VALUE)
