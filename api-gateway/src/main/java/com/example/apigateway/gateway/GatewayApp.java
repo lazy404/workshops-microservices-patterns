@@ -5,6 +5,7 @@ import net.jodah.failsafe.RetryPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -44,6 +45,7 @@ public class GatewayApp {
     }
 
     @Bean
+    @LoadBalanced
     RestTemplate rest() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setReadTimeout(3000);
@@ -85,7 +87,7 @@ class Controllers {
 
     @RequestMapping(value = "/banners", produces = MediaType.IMAGE_PNG_VALUE)
     public CompletableFuture<byte[]> getBanners() {
-        final String bannersUrl = "http://localhost:8081/";
+        final String bannersUrl = "http://banners/";
 
         final RetryPolicy rt = new RetryPolicy()
                 .retryOn(Exception.class)
@@ -102,7 +104,7 @@ class Controllers {
     public CompletableFuture<ResponseEntity<String>> profanityProxy(@RequestBody(required = false) String payload,
                                                                     final HttpServletRequest request) {
 
-        final String profanityProxy = "http://localhost:36268/";
+        final String profanityProxy = "http://profanity/";
         final String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 
         URI uri = UriComponentsBuilder.fromHttpUrl(profanityProxy)
@@ -115,11 +117,12 @@ class Controllers {
     public CompletableFuture<ResponseEntity<String>> legacyTodos(@RequestBody(required = false) String payload,
                                                                  final HttpServletRequest request) {
 
-        final String legacyApiUrl = "http://localhost:8080/";
+        final String legacyApiUrl = "http://legacy/";
         final String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 
         URI uri = UriComponentsBuilder.fromHttpUrl(legacyApiUrl)
                 .path(path).build().toUri();
+
 
         return makeCall(uri, payload, request);
     }
