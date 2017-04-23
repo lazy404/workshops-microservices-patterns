@@ -42,3 +42,26 @@ The test is run as a part of Intergration Testing phase which can be triggered w
 
 TIP: The missing UI artifact `com.example.patterns:todo-app-ui` can be buld with `mvn clean install` in the todo-app-ui folder.
 
+== API Gateway
+
+image::tasks-api_gateway.png[]
+
+The _TODO application(TM)_ become a great success, so that business wants to monetize the business by adding commercial banners on the top of the page.
+
+=== Context
+
+A new service has been added to the pool: a todo page displays a commercial banner provider directly from a service owned by the marketing department.
+The functionality is provided by a *banners-service* service, which is a _full stack microservice_ - provides a random image, ready to include directly onto the todo page.
+
+=== Task #{counter:exercise}
+
+Introduce an API gateway - a new component which hosts the UI and routes appropriate requests to services:
+
+- `/banners/**` are forwarded to the *banners-service* (http://localhost:8081)
+- `/api/**` calls are forwarded to the legacy application - *todo-app* (http://localhost:8080)
+
+IMPORTANT: Implement the missing TODOs in `GatewayApp.java` in the *api-gateway* project
+
+=== How to run
+
+Run `mvn spring-boot:run` from *api-gateway* project. The gateway listens on the port 9998.
