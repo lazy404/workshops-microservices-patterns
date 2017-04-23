@@ -1,0 +1,10 @@
+= Distilling microservices patterns
+
+Welcome to microservices patterns workshop.
+This workshop is intended to guide you through multiple microservice patterns, based on modularising a simplistic _TODO application(TM)_.
+
+== Before we start
+
+For sanity, when setting up a new task, start with `mvn install` with the parent `pom`
+
+
