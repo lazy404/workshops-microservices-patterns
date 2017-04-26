@@ -3,9 +3,27 @@ package com.example.services;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netflix.client.config.CommonClientConfigKey;
+import com.netflix.client.config.DefaultClientConfigImpl;
+import com.netflix.client.config.IClientConfigKey;
+import com.netflix.discovery.converters.Auto;
+import com.netflix.loadbalancer.ConfigurationBasedServerList;
+import com.netflix.loadbalancer.Server;
+import com.netflix.loadbalancer.ServerList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.cloud.netflix.ribbon.RibbonClient;
+import org.springframework.cloud.netflix.ribbon.StaticServerList;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,18 +37,46 @@ import java.net.URI;
 import java.util.Arrays;
 
 @SpringBootApplication
-@RestController
+@EnableDiscoveryClient
+@RibbonClient(value = "profanity-check-service", configuration = ProfanityServiceCfg.class)
 public class ProfanityProxy {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ProfanityProxy.class, args);
+    }
+
+    @LoadBalanced
+    @Bean
+    RestTemplate rest() {
+        return new RestTemplate();
+    }
+
+}
+
+class ProfanityServiceCfg {
+
+    @Bean
+    public ServerList<Server> ribbonServerList() {
+         return new StaticServerList<>(new Server("localhost", 19990));
+    }
+
+}
+
+@Component
+@RestController
+class Controllers {
+
+    @Autowired
+    RestTemplate rest;
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST},
             value = "/api/**", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> foo(@RequestBody(required = false) ObjectNode payload,
-                    final HttpServletRequest request) {
+                                      final HttpServletRequest request) {
 
-        RestTemplate rest = new RestTemplate();
         ObjectNode newPayload = maskProfanityWords(payload);
 
-        final String legacyApiUrl = "http://localhost:8080/";
+        final String legacyApiUrl = "http://legacy/";
         final String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 
         URI uri = UriComponentsBuilder.fromHttpUrl(legacyApiUrl)
@@ -46,8 +92,7 @@ public class ProfanityProxy {
     }
 
     public ObjectNode maskProfanityWords(ObjectNode payload) {
-        RestTemplate rest = new RestTemplate();
-        URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:19990/")
+        URI uri = UriComponentsBuilder.fromHttpUrl("http://profanity-check-service/")
                 .path("checkprofanity")
                 .queryParam("text", payload.at("/title").asText())
                 .build().toUri();
@@ -62,10 +107,6 @@ public class ProfanityProxy {
         }
 
         return payload;
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(ProfanityProxy.class, args);
     }
 
 }

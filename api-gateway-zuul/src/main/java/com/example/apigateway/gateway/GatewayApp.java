@@ -23,6 +23,7 @@ import java.util.List;
 
 @EnableZuulProxy
 @SpringBootApplication
+//TODO: @EnableDiscoveryClient
 public class GatewayApp {
 
     public static void main(String[] args) {

@@ -26,6 +26,7 @@
         <module>api-gateway</module>
         <module>profanity-filter</module>
         <module>profanity-check-service</module>
+        <module>registry</module>
     </modules>
 
 </project>
