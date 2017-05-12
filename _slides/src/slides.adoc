@@ -1,0 +1,53 @@
+= Distilling Microservices Patterns
+Jakub Marchwicki <@kubem>
+:imagesdir: images
+:idprefix: slide_
+:icons: font
+:revealjs_customtheme: css/custom_serif.css
+:revealjs_center: false
+:revealjs_transition: fade
+:revealjs_progress: true
+:revealjs_history: true
+:revealjs_controls: false
+:revealjs_width: 1280
+:revealjs_height: 720
+:source-highlighter: coderay
+:ditaa-option-#transparent: true
+
+== About me
+
+.Jakub Marchwicki
+* _Some languages_ developer
+* http://jakub.marchwicki.pl/consultancy (twitter: @kubem)
+* position wise: ex-architect, ex-manager, ex-consultant
+
+.Mikołaj Jaskulski
+* Java developer, infoShare Academy tutor
+* building the microservice environment of http://tix.nl
+* Fan of Dockerized Spring Boot applications
+
+== Disclaimer
+
+****
+This is a part of a bigger microservices workshop. Basic _microservices_ awareness is implied.
+****
+
+include::sections/patterns-basics.adoc[]
+
+== Set of patterns
+
+* Consumer driven contracts
+* Front-end architectures (API Gateway)
+* Circuit breaker
+* Load balancing and Service orchestration
+* Externalized configuration and service discovery
+* Distributed logging and monitoring
+* Application security
+
+include::sections/patterns-consumer-driven-contracts.adoc[leveloffset=+1]
+include::sections/patterns-api-gateway.adoc[leveloffset=+1]
+include::sections/patterns-circuit-breakers.adoc[leveloffset=+1]
+include::sections/patterns-configuration-and-discovery.adoc[leveloffset=+1]
+include::sections/patterns-orchestration.adoc[leveloffset=+1]
+include::sections/patterns-monitoring.adoc[leveloffset=+1]
+include::sections/patterns-security.adoc[leveloffset=+1]

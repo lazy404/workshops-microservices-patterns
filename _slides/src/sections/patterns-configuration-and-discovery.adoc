@@ -1,0 +1,93 @@
+= Pattern #{counter:patterns}: Service discovery
+
+****
+In order to communicate with another service, a service needs to
+know the other service’s address
+****
+
+== Intent
+
+All solutions under _Service Discovery_ umbrella provide::
+
+* mechanism	for	an	instance	to	register	itself
+* they	provide	a way	to	find	the	service	once	it’s	registered
+
+Service	discovery	gets	more	complicated, though,	when	we	are	considering	an	environment	where	we	are	constantly	destroying	and deploying	new	instances	of	services.
+
+== Problem
+
+****
+Figure out where is the service +
+I'd like to call
+****
+
+== !
+
+image::configuration-and-discovery-53962.png[width="55%"]
+
+== Discussion
+
+Simplest solutions::
+* hardcode the physical address and port of all the services that a service needs to use
+* have addresses and ports externalized into a configuration file provided at startup time
+
+****
+Both cases forces static deployment (no changes in the infrastructure) which contradicts microservices agility (a distributed monolith?)
+****
+
+== !
+
+Realistic solution::
+* location of services is provided indirectly (decoupled between the services through shared abstractions)
+
+****
+In microservicers environments services stay decoupled and mobile
+****
+
+== Structure
+
+Client-Side Service Discovery::
+* each service register itself in a central registry
+* all services look up the information
+
+== !
+
+image::configuration-and-discovery-70d46.png[width="60%"]
+
+== !
+
+Server-Side Service Discovery::
+* store the information on the load-balancer (AWS Elastic Load Balancing works that way)
+* clients always call same address which encapsulate the dynamic changes of implementations
+
+== !
+
+image::configuration-and-discovery-b6478.png[]
+
+== !
+
+.Consistency vs. Availability
+* All information are stored in a consistent fashion (placed in a single atomic store) - *consistency*
+* Information are distributed in a peer-to-peer manner (eventual consistency) - *availability*
+
+****
+(...) it is impossible for a distributed computer system to simultaneously provide all three of the following guarantees: Consistency, Availability and Partition tolerance.
+****
+
+== Example
+
+Known implementations::
+* Zookeeper
+* Consul
+* Eureka
+
+[.live-demo]
+== Exercise
+
+****
+Task #5 & #6: Load balancing
+****
+
+****
+Task #7 & #8: Service discovery
+****

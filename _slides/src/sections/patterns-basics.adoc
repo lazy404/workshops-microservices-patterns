@@ -1,0 +1,88 @@
+== Why miroservices?
+
+* Better scaling (of people not solutions)
+* Decentralizing decisions
+* Frequent deployments
+* Reduced local complexity
+** What about overall complexity? But...
+
+== Problems we had
+
+* Builds which takes forever
+* Deployments which takes forever
+* Implementation of a features which takes forever
+* MTTRF (mean time to resolve failure) damaging organization reputation
+* Atomic releases, you need to wait until all features are complete to release
+* In case of failure you rollback all changes, even these ones which worked
+
+== Problems we have
+
+* No-one completely grasp the whole solutions. But is it a bad thing?
+* Mind-shift requiring *new operating model*
+* When things goes wrong it first the *where* problem rather than *why*?
+* Potential increase in latency
+
+== Problems we have
+
+.As described in literature
+* Conway's law
+* fallacies of distributed computing
+* CAP (consistency, availability, partition tolerance) theorem
+
+== Conway's Law
+
+[quote ,M. Conway]
+""
+Any organization that designs a system (defined broadly) will produce a design whose structure is a copy of the organization’s communication structure.
+""
+
+== CAP theorem, aka Brewer's theorem
+
+[quote ,Wikipedia]
+""
+(...) it is impossible for a distributed computer system to simultaneously provide all three of the following guarantees: Consistency, Availability and Partition tolerance.
+""
+
+[%notitle]
+=== CAP guarantees
+
+[quote,Wikipedia]
+""
+Consistency:: every read receives the most recent write or an error
+
+Availability:: every request receives a response, without guarantee that it contains the most recent version of the information
+
+Partition tolerance:: the system continues to operate despite arbitrary partitioning due to network failures
+""
+
+== Fallacies of distributed computing
+
+[quote, Wikipedia]
+""
+(...) are a set of assertions made by L Peter Deutsch and others at Sun Microsystems describing false assumptions that programmers new to distributed applications invariably make
+""
+
+[%notitle]
+== list of fallacies
+
+8 fallacies of distributed computing::
+. The network is reliable.
+. Latency is zero.
+. Bandwidth is infinite.
+. The network is secure.
+. Topology doesn't change.
+. There is one administrator.
+. Transport cost is zero.
+. The network is homogeneous.
+
+== How are we solving it?
+
+// TODO: rozwinąć te punkty np na bazie książki Bonera - Reactive_Microservices_Architecture
+
+* Failure isolation - _bulkheading_
+* Autonomous services - service promises its own behaviour by publishing
+its protocol/API
+* Single responsibility - encapsulate a single concept
+* State ownership
+* Asynchronous, message based communication
+* Location transparency
